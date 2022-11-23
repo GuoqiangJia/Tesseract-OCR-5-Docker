@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
     make \
     pkg-config \
     wget \
+    python3.7 \
     xsltproc \
     && rm -rf /var/lib/apt/lists/*
 
@@ -50,11 +51,23 @@ RUN chmod +x ./get-languages.sh
 # download traineddata languages
 RUN ./get-languages.sh
 
+WORKDIR /src
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+RUN update-alternatives --set python /usr/bin/python3.7
+
+RUN mkdir -p api
+WORKDIR /src/api/
+COPY requirements.txt .
+COPY pytesseract.py .
+COPY app.py .
+RUN python -m pip install -U setuptools && python -m pip install --no-cache-dir -r requirements.txt
+CMD ["python", "app.py"]
+
 # go to user input/output folder
-WORKDIR /tmp/
+#WORKDIR /tmp/
 
 # CMD ["tesseract", "--version"]
-CMD ["tesseract", "--list-langs"]
+#CMD ["tesseract", "--list-langs"]
 
 # docker pull debian:11
 # docker build --tag tesseract:latest --build-arg TESSERACT_VERSION=main .

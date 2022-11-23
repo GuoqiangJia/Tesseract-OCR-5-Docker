@@ -1,2 +1,2 @@
 eng
-deu
+chi_sim
